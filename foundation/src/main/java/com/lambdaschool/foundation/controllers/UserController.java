@@ -1,6 +1,7 @@
 package com.lambdaschool.foundation.controllers;
 
 import com.lambdaschool.foundation.models.ErrorDetail;
+import com.lambdaschool.foundation.models.Item;
 import com.lambdaschool.foundation.models.User;
 import com.lambdaschool.foundation.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -61,6 +62,7 @@ public class UserController
         return new ResponseEntity<>(myUsers,
                                     HttpStatus.OK);
     }
+
 
     /**
      * Returns a single user based off a user id number
@@ -377,4 +379,22 @@ public class UserController
         return new ResponseEntity<>(u,
                                     HttpStatus.OK);
     }
+
+    @ApiOperation(value = "returns all user items",
+            response = User.class,
+            responseContainer = "List")
+    @ApiResponses(value = {@ApiResponse(code = 200,
+            message = "User Found",
+            response = User.class), @ApiResponse(code = 404,
+            message = "User Not Found",
+            response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    // http://localhost:2019/users/items
+    @GetMapping(value = "/items", produces = {"application/json"})
+    public ResponseEntity<?> getCurrentUserItems(Authentication authentication) {
+        User u = userService.findByName(authentication.getName());
+        List<Item> myList = u.getItems();
+        return new ResponseEntity<>(myList, HttpStatus.OK);
+    }
+
 }

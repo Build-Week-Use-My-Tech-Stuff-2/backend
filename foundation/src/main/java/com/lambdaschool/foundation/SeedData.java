@@ -3,10 +3,8 @@ package com.lambdaschool.foundation;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import com.lambdaschool.foundation.models.Role;
-import com.lambdaschool.foundation.models.User;
-import com.lambdaschool.foundation.models.UserRoles;
-import com.lambdaschool.foundation.models.Useremail;
+import com.lambdaschool.foundation.models.*;
+import com.lambdaschool.foundation.services.ItemService;
 import com.lambdaschool.foundation.services.RoleService;
 import com.lambdaschool.foundation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,12 @@ public class SeedData
      */
     @Autowired
     RoleService roleService;
+
+    /**
+     * Connects the item Service to this process
+     */
+    @Autowired
+    ItemService itemService;
 
     /**
      * Connects the user service to this process
@@ -141,8 +145,85 @@ public class SeedData
         // https://www.baeldung.com/regular-expressions-java
 
         FakeValuesService fakeValuesService = new FakeValuesService(new Locale("en-US"),
-                                                                    new RandomService());
-        Faker nameFaker = new Faker(new Locale("en-US"));
+                new RandomService());
+        Faker faker = new Faker(new Locale("en-US"));
+
+
+
+
+        for (int i = 0; i < 15; i++) {
+            Item fakeitem;
+            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String quote = "this is a fake description of an item";
+
+            fakeitem = new Item(
+                    faker.gameOfThrones().character(),
+                    faker.gameOfThrones().house(),
+                    quote,
+                    faker.gameOfThrones().city(),
+                    true,
+                    (float) faker.number().randomDouble(2, 1, 1000),
+                    url,
+                    u5);
+
+            itemService.save(fakeitem);
+        }
+
+        for (int i = 0; i < 15; i++) {
+            Item fakeitem;
+            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String quote = "this is a fake description of an item";
+
+            fakeitem = new Item(
+                    faker.gameOfThrones().character(),
+                    faker.gameOfThrones().house(),
+                    quote,
+                    faker.gameOfThrones().city(),
+                    true,
+                    (float) faker.number().randomDouble(2, 1, 1000),
+                    url,
+                    u3);
+
+            itemService.save(fakeitem);
+        }
+
+        for (int i = 0; i < 15; i++) {
+            Item fakeitem;
+            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String quote = "this is a fake description of an item";
+
+            fakeitem = new Item(
+                    faker.gameOfThrones().character(),
+                    faker.gameOfThrones().house(),
+                    quote,
+                    faker.gameOfThrones().city(),
+                    true,
+                    (float) faker.number().randomDouble(2, 1, 1000),
+                    url,
+                    u4);
+
+            itemService.save(fakeitem);
+        }
+
+
+        /*
+        Item newItem = new Item(
+                faker.name().fullName(),
+                "thisisatype",
+                "thisisadescription",
+                "thisisalocation",
+                true,
+                26.95f,
+                "https://cnet3.cbsistatic.com/img/3Hrt9JA8KaYDM9ip1vXGxhEp4yc=/1200x675/2019/09/10/2e5b33b9-5b16-46a4-89d0-b7251ace8e71/google-logo-5.jpg",
+                u5
+
+        );
+
+        itemService.save(newItem);
+        */
+
+
+
 
         for (int i = 0; i < 25; i++)
         {
@@ -152,10 +233,10 @@ public class SeedData
             users = new ArrayList<>();
             users.add(new UserRoles(new User(),
                                     r2));
-            fakeUser = new User(nameFaker.name()
+            fakeUser = new User(faker.name()
                                         .username(),
                                 "password",
-                                nameFaker.internet()
+                                faker.internet()
                                         .emailAddress(),
                                 users);
             fakeUser.getUseremails()

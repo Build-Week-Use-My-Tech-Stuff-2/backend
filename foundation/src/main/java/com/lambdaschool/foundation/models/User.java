@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -85,6 +84,11 @@ public class User
     @Email
     private String primaryemail;
 
+    // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * One to many relation ship with Useremails
+     */
     @ApiModelProperty(name = "user emails",
             value = "List of user emails for this users")
     @OneToMany(mappedBy = "user",
@@ -105,6 +109,17 @@ public class User
     @JsonIgnoreProperties(value = "user",
             allowSetters = true)
     private List<UserRoles> roles = new ArrayList<>();
+
+    /**
+     * One to many relation ship with Items
+     */
+    @OneToMany(mappedBy = "lender",
+            cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "lender",
+            allowSetters = true)
+    private List<Item> items = new ArrayList<>();
+
+    // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor used primarily by the JPA.
@@ -240,6 +255,8 @@ public class User
         this.password = passwordEncoder.encode(password);
     }
 
+    // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Getter for the list of useremails for this user
      *
@@ -290,6 +307,18 @@ public class User
         roles.add(new UserRoles(this,
                                 role));
     }
+
+    public List<Item> getItems()
+    {
+        return items;
+    }
+
+    public void setItems(List<Item> items)
+    {
+        this.items = items;
+    }
+
+    // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Internally, user security requires a list of authorities, roles, that the user has. This method is a simple way to provide those.
