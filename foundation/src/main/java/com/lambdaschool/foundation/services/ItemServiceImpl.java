@@ -4,6 +4,8 @@ import com.lambdaschool.foundation.exceptions.ResourceNotFoundException;
 import com.lambdaschool.foundation.handlers.HelperFunctions;
 import com.lambdaschool.foundation.models.Item;
 import com.lambdaschool.foundation.models.User;
+import com.lambdaschool.foundation.models.UserRoles;
+import com.lambdaschool.foundation.models.Useremail;
 import com.lambdaschool.foundation.repository.ItemRepository;
 import com.lambdaschool.foundation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +101,7 @@ public class ItemServiceImpl
         Item newItem = new Item();
 
         if (item.getItemid() != 0) {
+            System.out.println("item found, item id = "+ item.getItemid());
             itemrepos.findById(item.getItemid())
                     .orElseThrow(() -> new ResourceNotFoundException("Item id " + item.getItemid() + " not found"));
             newItem.setItemid(item.getItemid());
@@ -132,7 +135,7 @@ public class ItemServiceImpl
         return itemrepos.save(newItem);
     }
 
-
+    /*
     @Transactional
     @Override
     public Item update(
@@ -141,7 +144,42 @@ public class ItemServiceImpl
     {
         Item currentItem = findItemById(id);
 
-            return itemrepos.save(currentItem);
 
+        return itemrepos.save(currentItem);
+
+    }
+    */
+    @Transactional
+    @Override
+    public Item update(
+            Item item,
+            long id)
+    {
+        User currentUser = userrepos.findByUsername(item.getLender().getUsername());
+        Item updateitem = item;
+
+        if (helper.isAuthorizedToMakeChange(currentUser.getUsername()))
+        {
+            updateitem = itemrepos.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Item id " + item.getItemid() + " not found"));
+
+            updateitem.setItemid(id);
+            if (item.getItemname() != null){ updateitem.setItemname(item.getItemname().toLowerCase()); }
+            if ( item.getItemtype() != null){ updateitem.setItemtype(item.getItemtype().toLowerCase()); }
+            if ( item.getItemdescr() != null){ updateitem.setItemdescr(item.getItemdescr()); }
+            if ( item.getItemlocat() != null){ updateitem.setItemlocat(item.getItemlocat()); }
+            if ( item.getIsavailable() ){ updateitem.setIsavailable(item.getIsavailable()); }
+            if ( item.getItemrate() != 0.0 ){ updateitem.setItemrate(item.getItemrate()); System.out.println("itemrate update");}
+            if ( item.getItemimg() != null){ updateitem.setItemimg(item.getItemimg()); }
+
+            return itemrepos.save(updateitem);
+        } else
+        {
+            {
+                // note we should never get to this line but is needed for the compiler
+                // to recognize that this exception can be thrown
+                throw new ResourceNotFoundException("You are not authorized to make changes on this item my dude.");
+            }
+        }
     }
 }

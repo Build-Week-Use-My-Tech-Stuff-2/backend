@@ -40,17 +40,16 @@ public interface ContractService {
      */
     Contract save(Contract contract);
 
-    /*
     /**
      * Updates the provided fields in the contract record referenced by the primary key.
      * <p>
      *
      * @param contract just the contract fields to be updated.
      * @param id   The primary key (long) of the contract to update
+     * @param user   The user making the update
      * @return the complete contract object that got updated
      */
-    /*
-    Contract update(Contract contract, long id);
-    */
+    Contract update(Contract contract, long id, User user);
+
 }
 

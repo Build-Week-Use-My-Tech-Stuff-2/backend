@@ -45,6 +45,7 @@ public class ItemController
             responseContainer = "List")
     @GetMapping(value = "/items",
             produces = {"application/json"})
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_LENDER','ROLE_USER')")
     public ResponseEntity<?> listAllItems()
     {
         List<Item> myItems = itemService.findAll();
@@ -124,6 +125,7 @@ public class ItemController
     @ApiParam(value = "Item Name Substring",
             required = true,
             example = "john")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_LENDER','ROLE_USER')")
     @GetMapping(value = "/item/name/like/{itemName}",
             produces = {"application/json"})
     public ResponseEntity<?> getItemLikeName(
@@ -209,9 +211,9 @@ public class ItemController
 
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
     }
-
+    /*
     /**
-     * Given a complete Item Object
+     * (THIS ENDPOINT IN DEACTIVATED Given a complete Item Object
      * Given the item id, primary key, is in the Item table,
      * replace the Item record
      * <br> Example: <a href="http://localhost:2019/items/item/15">http://localhost:2019/items/item/15</a>
@@ -222,7 +224,7 @@ public class ItemController
      * @return status of OK
      * @see ItemService#save(Item) ItemService.save(Item)
      */
-
+    /*
     @ApiOperation(value = "updates a item given in the request body",
             response = Void.class)
     @ApiResponses(value = {@ApiResponse(code = 200,
@@ -243,13 +245,17 @@ public class ItemController
                     required = true,
                     example = "4")
             @PathVariable
-                    long itemid)
+                    long itemid,
+            Authentication auth)
     {
+        User u = userService.findByName(auth.getName());
+        //newItem.setLender(u);
         updateItem.setItemid(itemid);
         itemService.save(updateItem);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+     */
 
 
     /**
@@ -280,8 +286,13 @@ public class ItemController
                     required = true,
                     example = "4")
             @PathVariable
-                    long id)
+                    long id,
+            Authentication auth)
     {
+        //get user who is making update request
+        User u = userService.findByName(auth.getName());
+        //if item object does not contain a lender set the lender to the user who is making the request
+        if(updateItem.getLender() == null){updateItem.setLender(u);}
         itemService.update(updateItem,
                 id);
         return new ResponseEntity<>(HttpStatus.OK);

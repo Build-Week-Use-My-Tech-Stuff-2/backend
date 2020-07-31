@@ -68,7 +68,7 @@ public class ContractController
      * @return JSON object of the contract you seek
      * @see ContractService#findContractById(long) ContractService.findContractById(long)
      */
-    @ApiOperation(value = "Retrieve a contract based of off contract id",
+    @ApiOperation(value = "Retrieve a contract based off of contract id",
             response = Contract.class)
     @ApiResponses(value = {@ApiResponse(code = 200,
             message = "Contract Found",
@@ -133,7 +133,7 @@ public class ContractController
             message = "Contract Not Found",
             response = ErrorDetail.class)})
     // http://localhost:2019/contracts/contract/{itemid}
-    @PostMapping(value = "/contract/{itemid}", consumes = {"application/json"})
+    @PostMapping(value = "/new/{itemid}", consumes = {"application/json"})
     public ResponseEntity<?> addNewContract(@Valid
                                                 @ApiParam(value = "contractlength: int",
                                                         required = true)
@@ -310,6 +310,43 @@ public class ContractController
         responseHeaders.setLocation(newContractURI);
 
         return new ResponseEntity<>("Contract with ID#" + c.getContractid() + " updated!", responseHeaders, HttpStatus.CREATED);
+    }
+
+    /**
+     * Updates the contrat record associated with the given contract id with the provided data. Only the provided fields are affected.
+     * <br> Example: <a href="http://localhost:2019/items/item/7">http://localhost:2019/items/item/7</a>
+     *
+     * @param contractUpdate An object containing values for just the fields that are being updated. All other fields are left NULL.
+     * @param contractid         The primary key of the item you wish to update.
+     * @return A status of OK
+     * @see ContractService#update(Contract, long, User) ContractService.update(Contract, long, User)
+     */
+    @ApiOperation(value = "updates a contract with the information given in the request body",
+            response = Void.class)
+    @ApiResponses(value = {@ApiResponse(code = 200,
+            message = "Contract Found",
+            response = Contract.class), @ApiResponse(code = 404,
+            message = "Contract Not Found",
+            response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyRole('ADMIN','LENDER','USER')")
+    @PatchMapping(value = "/contract/{contractid}",
+            consumes = {"application/json"})
+    public ResponseEntity<?> updateItem(
+            @ApiParam(value = "a contract object with just the information needed to be updated",
+                    required = true)
+            @RequestBody
+                    Contract contractUpdate,
+            @ApiParam(value = "contractid",
+                    required = true,
+                    example = "4")
+            @PathVariable
+                    long contractid,
+            Authentication auth)
+    {
+        //get user who is making update request
+        User u = userservice.findByName(auth.getName());
+        contractService.update(contractUpdate, contractid, u);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

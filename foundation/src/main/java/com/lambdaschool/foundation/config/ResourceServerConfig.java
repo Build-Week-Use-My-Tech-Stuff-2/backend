@@ -69,6 +69,8 @@ public class ResourceServerConfig
                 .authenticated()
                 .antMatchers("/roles/**")
                 .hasAnyRole("ADMIN","LENDER","USER")
+                .antMatchers("/contracts/**")
+                .hasAnyRole("ADMIN","LENDER","USER")
                 .antMatchers("/items/**")
                 .hasAnyRole("ADMIN","LENDER","USER")
                 .and()

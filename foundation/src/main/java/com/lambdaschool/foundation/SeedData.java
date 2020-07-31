@@ -151,7 +151,7 @@ public class SeedData
 
 
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 5; i++) {
             Item fakeitem;
             String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
@@ -169,7 +169,7 @@ public class SeedData
             itemService.save(fakeitem);
         }
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 5; i++) {
             Item fakeitem;
             String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
@@ -187,7 +187,7 @@ public class SeedData
             itemService.save(fakeitem);
         }
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 5; i++) {
             Item fakeitem;
             String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
@@ -225,7 +225,7 @@ public class SeedData
 
 
 
-        for (int i = 0; i < 25; i++)
+        for (int i = 0; i < 5; i++)
         {
             new User();
             User fakeUser;

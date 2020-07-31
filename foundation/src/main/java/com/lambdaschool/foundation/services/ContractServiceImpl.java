@@ -107,9 +107,21 @@ public class ContractServiceImpl
 
         //unless the lender and the rentee have both agreed that the contract is complete set active true
         newContract.setActive(true);
-        if(newContract.isRenteecomplete() && newContract.isLendercomplete()){newContract.setActive(false);}
-
-        if(newContract.isLenderaccept() && newContract.isRenteeaccept()){
+        //
+        System.out.println("contract:");
+        System.out.println("rentee complete = " +  contract.isRenteecomplete() + "lender complete = " + contract.isLendercomplete());
+        System.out.println("newcontract:");
+        System.out.println("rentee complete = " +  newContract.isRenteecomplete() + "lender complete = " + newContract.isLendercomplete());
+        //
+        if(contract.isRenteecomplete() && contract.isLendercomplete()){newContract.setActive(false);}
+        //
+        System.out.println("contract:");
+        System.out.println("rentee accept = " +  contract.isRenteeaccept() + "lender accept = " + contract.isLenderaccept());
+        System.out.println("newcontract:");
+        System.out.println("rentee accept = " +  newContract.isRenteeaccept() + "lender accept = " + newContract.isLenderaccept());
+        //
+        if(contract.isLenderaccept() && contract.isRenteeaccept()){
+            System.out.println("we are in!");
             //build dates
             Date machineStart = new Date();
             Date machineEnd = Date.from(machineStart.toInstant().plusSeconds(86400 * contract.getContractlength())); //just adding the contract length
@@ -141,9 +153,61 @@ public class ContractServiceImpl
         return contractrepos.save(newContract);
     }
 
-    /*
+    @Transactional
+    @Override
+    public Contract update(
+            Contract contract,
+            long id,
+            User currentuser)
+    {
+        //create blank contract
+        Contract updatecontract = contract;
 
-    */
+        //set blank contract to requested contract
+        updatecontract = contractrepos.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Contract id " + contract.getContractid() + " not found"));
+
+        //check if currentuser is authorized
+        if (helper.isAuthorizedToMakeChange(currentuser.getUsername()))
+        {
+            //set contract id
+            updatecontract.setContractid(id);
+
+            //check if currentuser is lender
+            if(currentuser == updatecontract.getItem().getLender()){
+
+                //update individual items
+                if (contract.isLenderaccept()){ updatecontract.setLenderaccept(contract.isLenderaccept()); }
+                if (contract.isLendercomplete()){ updatecontract.setLendercomplete(contract.isLendercomplete()); }
+                //if (contract.getContractlength() != updatecontract.getContractlength()){  }
+
+                return contractrepos.save(updatecontract);
+
+                //check if currentuser is rentee
+            }else if(currentuser == updatecontract.getRentee()){
+
+                //update individual items
+                if (contract.isRenteeaccept()){ updatecontract.setRenteeaccept(contract.isRenteeaccept()); }
+                if (contract.isRenteecomplete()){ updatecontract.setRenteecomplete(contract.isRenteecomplete()); }
+
+                return contractrepos.save(updatecontract);
+
+                //if (contract.getContractlength() != updatecontract.getContractlength()){  }
+            }else{ throw new ResourceNotFoundException("HEY! What are you doing in this section of the databa.. WAIT! GET BACK HERE! YOU CANT RUN FROM ME!"); }
+
+
+
+        } else
+        {
+            {
+                // note we should never get to this line but is needed for the compiler
+                // to recognize that this exception can be thrown
+                throw new ResourceNotFoundException("You are not authorized to make changes on this contract my dude.");
+            }
+        }
+    }
+
+
 
 
 
