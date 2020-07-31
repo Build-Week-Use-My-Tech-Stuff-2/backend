@@ -141,22 +141,7 @@ public class ItemServiceImpl
     {
         Item currentItem = findItemById(id);
 
-        if (helper.isAuthorizedToMakeChange(currentItem.getItemname()))
-        {
-            if (item.getItemname() != null)
-            {
-                currentItem.setItemname(item.getItemname()
-                        .toLowerCase());
-            }
-
             return itemrepos.save(currentItem);
-        } else
-        {
-            {
-                // note we should never get to this line but is needed for the compiler
-                // to recognize that this exception can be thrown
-                throw new ResourceNotFoundException("This item is not authorized to make change");
-            }
-        }
+
     }
 }

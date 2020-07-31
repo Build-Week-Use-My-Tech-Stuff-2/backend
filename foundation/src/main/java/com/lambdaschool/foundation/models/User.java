@@ -119,6 +119,15 @@ public class User
             allowSetters = true)
     private List<Item> items = new ArrayList<>();
 
+    /**
+     * One to many relation ship with Contracts
+     */
+    @OneToMany(mappedBy = "rentee",
+            cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "rentee",
+            allowSetters = true)
+    private List<Contract> contracts = new ArrayList<>();
+
     // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**

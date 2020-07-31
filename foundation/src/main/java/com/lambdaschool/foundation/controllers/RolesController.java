@@ -1,11 +1,16 @@
 package com.lambdaschool.foundation.controllers;
 
 import com.lambdaschool.foundation.models.Role;
+import com.lambdaschool.foundation.models.User;
+import com.lambdaschool.foundation.models.UserRoles;
 import com.lambdaschool.foundation.services.RoleService;
+import com.lambdaschool.foundation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.Authenticator;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +40,9 @@ public class RolesController
      */
     @Autowired
     RoleService roleService;
+
+    @Autowired
+    UserService userService;
 
     /**
      * List of all roles
@@ -178,5 +188,28 @@ public class RolesController
         newRole = roleService.update(roleid,
                                      newRole);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PatchMapping(value = "/promote",
+            consumes = {"application/json"})
+    public ResponseEntity<?> upgradeToLender(Authentication authentication){
+
+        // grab user from token
+        User u = userService.findByName(authentication.getName());
+        // add lender role
+        List<UserRoles> uRoles = new ArrayList<>();
+        uRoles.add(new UserRoles(u, roleService.findByName("lender")));
+        //long roleid = 2;
+        u.getRoles().clear();
+        u.setRoles(uRoles);
+        userService.save(u);
+
+        {
+            //newRole = roleService.update(roleid, newRole);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
     }
 }

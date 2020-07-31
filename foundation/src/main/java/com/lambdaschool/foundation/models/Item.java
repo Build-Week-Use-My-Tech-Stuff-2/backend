@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -133,6 +135,15 @@ public class Item
     @JsonIgnoreProperties(value = "items",
             allowSetters = true)
     private User lender;
+
+    /**
+     * One to many relation ship with Contracts
+     */
+    @OneToMany(mappedBy = "item",
+            cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "item",
+            allowSetters = true)
+    private List<Contract> itemcontracts = new ArrayList<>();
 
     // Relationships /////////////////////////////////////////////////////////////////////////////////////////////////
 

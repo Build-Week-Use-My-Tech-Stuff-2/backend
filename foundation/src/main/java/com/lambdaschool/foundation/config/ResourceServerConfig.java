@@ -55,20 +55,22 @@ public class ResourceServerConfig
                 .permitAll()
                 .antMatchers(HttpMethod.POST,
                              "/users/**")
-                .hasAnyRole("ADMIN")
+                .hasAnyRole("ADMIN","LENDER","USER")
                 .antMatchers(HttpMethod.DELETE,
                              "/users/**")
-                .hasAnyRole("ADMIN")
+                .hasAnyRole("ADMIN","LENDER","USER")
                 .antMatchers(HttpMethod.PUT,
                              "/users/**")
-                .hasAnyRole("ADMIN")
+                .hasAnyRole("ADMIN","LENDER","USER")
                 .antMatchers("/users/**",
                              "/useremails/**",
                              "/oauth/revoke-token",
                              "/logout")
                 .authenticated()
                 .antMatchers("/roles/**")
-                .hasAnyRole("ADMIN")
+                .hasAnyRole("ADMIN","LENDER","USER")
+                .antMatchers("/items/**")
+                .hasAnyRole("ADMIN","LENDER","USER")
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(new OAuth2AccessDeniedHandler());

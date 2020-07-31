@@ -60,14 +60,14 @@ public class SeedData
             Exception
     {
         Role r1 = new Role("admin");
-        Role r2 = new Role("user");
-        Role r3 = new Role("data");
+        Role r2 = new Role("lender");
+        Role r3 = new Role("user");
 
         r1 = roleService.save(r1);
         r2 = roleService.save(r2);
         r3 = roleService.save(r3);
 
-        // admin, data, user
+        // admin, lender, user
         ArrayList<UserRoles> admins = new ArrayList<>();
         admins.add(new UserRoles(new User(),
                                  r1));
@@ -88,16 +88,16 @@ public class SeedData
 
         userService.save(u1);
 
-        // data, user
-        ArrayList<UserRoles> datas = new ArrayList<>();
-        datas.add(new UserRoles(new User(),
+        // lender, user
+        ArrayList<UserRoles> lenders = new ArrayList<>();
+        lenders.add(new UserRoles(new User(),
                                 r3));
-        datas.add(new UserRoles(new User(),
+        lenders.add(new UserRoles(new User(),
                                 r2));
         User u2 = new User("cinnamon",
                            "1234567",
                            "cinnamon@lambdaschool.local",
-                           datas);
+                           lenders);
         u2.getUseremails()
                 .add(new Useremail(u2,
                                    "cinnamon@mymail.local"));
@@ -153,7 +153,7 @@ public class SeedData
 
         for (int i = 0; i < 15; i++) {
             Item fakeitem;
-            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
 
             fakeitem = new Item(
@@ -171,7 +171,7 @@ public class SeedData
 
         for (int i = 0; i < 15; i++) {
             Item fakeitem;
-            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
 
             fakeitem = new Item(
@@ -189,7 +189,7 @@ public class SeedData
 
         for (int i = 0; i < 15; i++) {
             Item fakeitem;
-            String url = "https://picsum.photos/" + faker.pokemon().name() + "/picsum/200/300";
+            String url = "https://picsum.photos/seed/" + faker.pokemon().name() + "/300/300";
             String quote = "this is a fake description of an item";
 
             fakeitem = new Item(

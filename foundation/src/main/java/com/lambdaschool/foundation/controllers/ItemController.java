@@ -3,10 +3,8 @@ package com.lambdaschool.foundation.controllers;
 
 import com.lambdaschool.foundation.models.*;
 import com.lambdaschool.foundation.models.Item;
-import com.lambdaschool.foundation.models.Item;
 import com.lambdaschool.foundation.services.ItemService;
-import com.lambdaschool.foundation.services.ItemService;
-import com.lambdaschool.foundation.services.ItemService;
+import com.lambdaschool.foundation.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -16,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,7 +31,7 @@ public class ItemController
     private ItemService itemService;
 
     @Autowired
-    private ItemService userService;
+    private UserService userService;
 
     /**
      * Returns a list of all items
@@ -44,7 +43,6 @@ public class ItemController
     @ApiOperation(value = "returns all Items",
             response = Item.class,
             responseContainer = "List")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/items",
             produces = {"application/json"})
     public ResponseEntity<?> listAllItems()
@@ -69,7 +67,6 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/item/{itemId}",
             produces = {"application/json"})
     public ResponseEntity<?> getItemById(
@@ -99,7 +96,6 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/item/name/{itemName}",
             produces = {"application/json"})
     public ResponseEntity<?> getItemByName(
@@ -128,7 +124,6 @@ public class ItemController
     @ApiParam(value = "Item Name Substring",
             required = true,
             example = "john")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/item/name/like/{itemName}",
             produces = {"application/json"})
     public ResponseEntity<?> getItemLikeName(
@@ -143,9 +138,9 @@ public class ItemController
     /**
      * Given a complete Item Object, create a new Item record and accompanying itememail records
      * and item role records.
-     * <br> Example: <a href="http://localhost:2019/items/item">http://localhost:2019/items/item</a>
+     * <br> Example: <a href="http://localhost:2019/items/itemadmin">http://localhost:2019/items/itemadmin</a>
      *
-     * @param newitem A complete new item to add including emails and roles.
+     * @param newItem A complete new item to add including emails and roles.
      *                roles must already exist.
      * @return A location header with the URI to the newly created item and a status of CREATED
      * @throws URISyntaxException Exception if something does not work in creating the location header
@@ -158,9 +153,50 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_LENDER')")
     // http://localhost:2019/items/item/
     @PostMapping(value = "/item", consumes = {"application/json"})
-    public ResponseEntity<?> addNewItem(@Valid @RequestBody Item newItem) {
+    public ResponseEntity<?> addNewItem(@Valid @RequestBody Item newItem,
+                                                                Authentication auth)
+    {
+        User u = userService.findByName(auth.getName());
+
+        newItem.setItemid(0);
+        newItem.setLender(u);
+        newItem = itemService.save(newItem);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        URI newItemURI = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{itemid}")
+                .buildAndExpand(newItem.getItemid())
+                .toUri();
+        responseHeaders.setLocation(newItemURI);
+
+        return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
+    }
+
+    /**
+     * Given a complete Item Object, create a new Item record and accompanying itememail records
+     * and item role records.
+     * <br> Example: <a href="http://localhost:2019/items/itemadmin">http://localhost:2019/items/itemadmin</a>
+     *
+     * @param newItem A complete new item to add including emails and roles.
+     *                roles must already exist.
+     * @return A location header with the URI to the newly created item and a status of CREATED
+     * @throws URISyntaxException Exception if something does not work in creating the location header
+     * @see ItemService#save(Item) ItemService.save(Item)
+     */
+    @ApiOperation(value = "adds a item given in the request body (ADMIN ONLY)",
+            response = Void.class)
+    @ApiResponses(value = {@ApiResponse(code = 200,
+            message = "Item Found",
+            response = Item.class), @ApiResponse(code = 404,
+            message = "Item Not Found",
+            response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_LENDER')")
+    // http://localhost:2019/items/itemadmin/
+    @PostMapping(value = "/itemadmin", consumes = {"application/json"})
+    public ResponseEntity<?> addNewItemADMIN(@Valid @RequestBody Item newItem) {
         newItem.setItemid(0);
         newItem = itemService.save(newItem);
 
@@ -194,6 +230,7 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyRole('ADMIN','LENDER')")
     @PutMapping(value = "/item/{itemid}",
             consumes = {"application/json"})
     public ResponseEntity<?> updateFullItem(
@@ -231,6 +268,7 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyRole('ADMIN','LENDER')")
     @PatchMapping(value = "/item/{id}",
             consumes = {"application/json"})
     public ResponseEntity<?> updateItem(
@@ -263,6 +301,7 @@ public class ItemController
             response = Item.class), @ApiResponse(code = 404,
             message = "Item Not Found",
             response = ErrorDetail.class)})
+    @PreAuthorize("hasAnyRole('ADMIN','LENDER')")
     @DeleteMapping(value = "/item/{id}")
     public ResponseEntity<?> deleteItemById(
             @ApiParam(value = "itemid",
