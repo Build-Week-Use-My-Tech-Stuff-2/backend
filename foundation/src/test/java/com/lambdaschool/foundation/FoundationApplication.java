@@ -52,7 +52,8 @@ public class FoundationApplication
         {
             // so run the application!
             SpringApplication.run(FoundationApplication.class,
-                                  args);
+                    args);
         }
+
     }
 }

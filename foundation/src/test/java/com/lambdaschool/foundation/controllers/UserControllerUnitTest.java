@@ -369,16 +369,10 @@ public class UserControllerUnitTest
         String apiUrl = "/users/user";
 
         // build a user
-        ArrayList<UserRoles> thisRole = new ArrayList<>();
-        ArrayList<Useremail> thisEmail = new ArrayList<>();
         User u1 = new User();
-        u1.setUserid(100);
         u1.setUsername("tiger");
         u1.setPassword("ILuvM4th!");
         u1.setPrimaryemail("tiger@home.local");
-        u1.setRoles(thisRole);
-        ;
-        u1.setUseremails(thisEmail);
 
         ObjectMapper mapper = new ObjectMapper();
         String userString = mapper.writeValueAsString(u1);
